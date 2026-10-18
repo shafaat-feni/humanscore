@@ -1,36 +1,36 @@
-import React, { useEffect } from 'react';
-import { updatePageMeta } from '../utils/seo';
+import React from 'react';
+import { LegalPage } from './LegalPage';
 
-export const PrivacyPolicy: React.FC = () => {
-  useEffect(() => {
-    updatePageMeta({
-      title: 'Privacy Policy',
-      description: 'Read the HumanScore privacy policy regarding local browser storage and data privacy.',
-      canonicalPath: '/privacy-policy',
-    });
-  }, []);
-
-  return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
-      <div className="bg-navy-900 text-white p-8 rounded-2xl space-y-3 shadow-md">
-        <span className="text-xs font-bold uppercase tracking-wider bg-teal text-navy-900 px-3 py-1 rounded-full">Legal</span>
-        <h1 className="text-3xl font-extrabold">Privacy Policy</h1>
-        <p className="text-slate-300 text-sm max-w-2xl">
-          Our commitment to protecting your privacy through client-side data handling.
-        </p>
-      </div>
-
-      <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm space-y-6 text-slate-700 text-sm leading-relaxed">
-        <h2 className="text-xl font-bold text-navy-900">Local Storage Persistence</h2>
-        <p>
-          HumanScore stores all completed assessment results locally in your browser using <code className="bg-slate-100 px-1.5 py-0.5 rounded text-navy-900 font-mono text-xs">localStorage</code> under the key <code className="bg-slate-100 px-1.5 py-0.5 rounded text-navy-900 font-mono text-xs">humanscore_assessments_v1</code>. No personal identification data, names, or emails are collected.
-        </p>
-
-        <h2 className="text-xl font-bold text-navy-900">Data Control & Deletion</h2>
-        <p>
-          You have full control over your stored history. You can export your data as JSON or CSV at any time from the Overall Assessment Index dashboard, or clear your history instantly using the clear-history control. Clearing browser site data will remove all stored results.
-        </p>
-      </div>
-    </div>
-  );
-};
+export const PrivacyPolicy: React.FC = () => (
+  <LegalPage
+    title="Privacy Policy"
+    lastUpdated="October 18, 2026"
+    intro="HumanScore is designed so that your assessment responses stay on your device."
+    sections={[
+      {
+        heading: 'What we store',
+        paragraphs: [
+          'When you complete an assessment, the result is saved in your browser\'s localStorage on your own device. We do not require registration or an account, and we do not send your assessment responses or results to a server.',
+        ],
+      },
+      {
+        heading: 'Your control',
+        paragraphs: [
+          'Because results live in your browser, you can remove them at any time by clearing this site\'s data in your browser settings. Results are not synced between devices or browsers, and clearing your browser data permanently deletes them.',
+        ],
+      },
+      {
+        heading: 'Hosting and technical logs',
+        paragraphs: [
+          'Like most websites, the service that hosts HumanScore may record standard technical information such as IP address, browser type, and requested pages in its server logs. This information is not linked to your assessment results.',
+        ],
+      },
+      {
+        heading: 'Changes to this policy',
+        paragraphs: [
+          'If we add features that change how data is handled, such as analytics or accounts, we will update this page before they take effect.',
+        ],
+      },
+    ]}
+  />
+);

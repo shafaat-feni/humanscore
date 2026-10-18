@@ -1,8 +1,10 @@
+import type { AssessmentCategory } from '../types/assessment';
+
 export interface SavedResult {
   id: string;
   assessmentId: string;
   assessmentTitle: string;
-  category: string;
+  category: AssessmentCategory;
   timestamp: number;
   rawResult: number | string;
   normalizedScore?: number;
@@ -14,6 +16,38 @@ export interface SavedResult {
 
 const STORAGE_KEY = 'humanscore_assessments_v1';
 const CURRENT_SCHEMA_VERSION = 1;
+/** Oldest results are dropped beyond this many records to keep localStorage bounded. */
+export const MAX_STORED_RESULTS = 500;
+
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return `res_${crypto.randomUUID()}`;
+  }
+  return `res_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+}
+
+function isOptionalFiniteNumber(v: unknown): boolean {
+  return v === undefined || (typeof v === 'number' && Number.isFinite(v));
+}
+
+function isValidRecord(item: unknown): item is SavedResult {
+  if (item === null || typeof item !== 'object') return false;
+  const r = item as Record<string, unknown>;
+  return (
+    typeof r.id === 'string' &&
+    typeof r.assessmentId === 'string' &&
+    typeof r.assessmentTitle === 'string' &&
+    typeof r.category === 'string' &&
+    typeof r.timestamp === 'number' &&
+    Number.isFinite(r.timestamp) &&
+    (typeof r.rawResult === 'string' || (typeof r.rawResult === 'number' && Number.isFinite(r.rawResult))) &&
+    isOptionalFiniteNumber(r.normalizedScore) &&
+    isOptionalFiniteNumber(r.maxScore) &&
+    isOptionalFiniteNumber(r.durationMs) &&
+    typeof r.version === 'number' &&
+    r.version <= CURRENT_SCHEMA_VERSION
+  );
+}
 
 export const storageService = {
   saveResult(result: Omit<SavedResult, 'id' | 'timestamp' | 'version'>): SavedResult | null {
@@ -21,13 +55,13 @@ export const storageService = {
       const results = storageService.getResults();
       const newRecord: SavedResult = {
         ...result,
-        id: `res_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        id: generateId(),
         timestamp: Date.now(),
         version: CURRENT_SCHEMA_VERSION,
       };
 
       results.unshift(newRecord);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(results));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(results.slice(0, MAX_STORED_RESULTS)));
       return newRecord;
     } catch (e) {
       console.error('Failed to save assessment result to localStorage:', e);
@@ -39,19 +73,9 @@ export const storageService = {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return [];
-      const parsed = JSON.parse(raw);
+      const parsed: unknown = JSON.parse(raw);
       if (!Array.isArray(parsed)) return [];
-
-      // Validate records against basic schema requirements
-      return parsed.filter((item): item is SavedResult => {
-        return (
-          item !== null &&
-          typeof item === 'object' &&
-          typeof item.id === 'string' &&
-          typeof item.assessmentId === 'string' &&
-          typeof item.timestamp === 'number'
-        );
-      });
+      return parsed.filter(isValidRecord);
     } catch (e) {
       console.error('Failed to read or parse assessment results from localStorage:', e);
       return [];

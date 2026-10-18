@@ -3,9 +3,10 @@ export interface TimerInstance {
   stop: () => number;
   getElapsedMs: () => number;
   isRunning: () => boolean;
+  reset: () => void;
 }
 
-export function createTimer(clockFn: () => number = () => Date.now()): TimerInstance {
+export function createTimer(clockFn: () => number = () => performance.now()): TimerInstance {
   let startTime: number | null = null;
   let accumulatedMs: number = 0;
   let running = false;
@@ -32,6 +33,11 @@ export function createTimer(clockFn: () => number = () => Date.now()): TimerInst
       return accumulatedMs;
     },
     isRunning: () => running,
+    reset: () => {
+      startTime = null;
+      accumulatedMs = 0;
+      running = false;
+    },
   };
 }
 

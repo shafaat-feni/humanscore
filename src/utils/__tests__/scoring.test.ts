@@ -31,6 +31,15 @@ describe('Scoring Engine', () => {
     expect(getInterpretation(50, sampleBands)?.label).toBe('Good Effort');
   });
 
+  it('handles decimal scores that fall between integer bands', () => {
+    expect(getInterpretation(40.5, sampleBands)?.label).toBe('Needs Practice');
+    expect(getInterpretation(75.5, sampleBands)?.label).toBe('Good Effort');
+    expect(getInterpretation(100.5, sampleBands)).toBeNull();
+    expect(getInterpretation(-1, sampleBands)).toBeNull();
+    expect(getInterpretation(50, [])).toBeNull();
+    expect(getInterpretation(NaN, sampleBands)).toBeNull();
+  });
+
   it('returns correct feedback messages', () => {
     expect(getFeedbackMessage(90, sampleBands)).toBe('Outstanding performance!');
     expect(getFeedbackMessage(20, sampleBands)).toBe('Keep practicing to build your score.');

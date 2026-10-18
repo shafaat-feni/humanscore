@@ -1,36 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Activity, Menu, X, BarChart2, BookOpen } from 'lucide-react';
+import { Activity, Menu, X, BarChart2 } from 'lucide-react';
 import { ASSESSMENTS } from '../../data/assessments';
+import { CATEGORIES } from '../../data/categories';
+import { searchAssessments } from '../../utils/search';
+
+const linkClass = ({ isActive }: { isActive: boolean }) =>
+  isActive ? 'text-teal font-semibold' : 'text-slate-300 hover:text-white transition';
+
+const dashboardClass = ({ isActive }: { isActive: boolean }) =>
+  `flex items-center gap-1 ${linkClass({ isActive })}`;
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<typeof ASSESSMENTS>([]);
+  const headerRef = useRef<HTMLElement>(null);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const q = e.target.value;
-    setSearchQuery(q);
-    if (q.trim().length > 1) {
-      setSearchResults(
-        ASSESSMENTS.filter(a =>
-          a.title.toLowerCase().includes(q.toLowerCase()) ||
-          a.shortDescription.toLowerCase().includes(q.toLowerCase())
-        )
-      );
-    } else {
-      setSearchResults([]);
-    }
-  };
+  const searchResults = useMemo(
+    () => (searchQuery.trim().length > 1 ? searchAssessments(ASSESSMENTS, searchQuery) : []),
+    [searchQuery]
+  );
+
+  const clearSearch = () => setSearchQuery('');
+
+  // Close the search dropdown on outside click or Escape.
+  useEffect(() => {
+    const onPointerDown = (e: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setSearchQuery('');
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSearchQuery('');
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+
+  const closeMobile = () => setMobileMenuOpen(false);
 
   return (
-    <header className="bg-navy-900 text-white sticky top-0 z-50 shadow-md">
+    <header ref={headerRef} className="bg-navy-900 text-white sticky top-0 z-50 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand */}
           <Link to="/" className="flex items-center space-x-2 group">
             <div className="bg-teal p-2 rounded-lg text-navy-900 font-bold group-hover:bg-teal-accent transition">
-              <Activity className="w-6 h-6" />
+              <Activity className="w-6 h-6" aria-hidden="true" />
             </div>
             <div>
               <span className="text-xl font-bold tracking-tight">HumanScore</span>
@@ -39,27 +59,15 @@ export const Navbar: React.FC = () => {
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-6 text-sm font-medium">
-            <NavLink to="/tests" className={({isActive}) => isActive ? "text-teal font-semibold" : "text-slate-300 hover:text-white transition"}>
-              All Tests
-            </NavLink>
-            <NavLink to="/physical" className={({isActive}) => isActive ? "text-teal font-semibold" : "text-slate-300 hover:text-white transition"}>
-              Physical
-            </NavLink>
-            <NavLink to="/cognitive" className={({isActive}) => isActive ? "text-teal font-semibold" : "text-slate-300 hover:text-white transition"}>
-              Cognitive
-            </NavLink>
-            <NavLink to="/psychological" className={({isActive}) => isActive ? "text-teal font-semibold" : "text-slate-300 hover:text-white transition"}>
-              Psychological
-            </NavLink>
-            <NavLink to="/lifestyle" className={({isActive}) => isActive ? "text-teal font-semibold" : "text-slate-300 hover:text-white transition"}>
-              Lifestyle
-            </NavLink>
-            <NavLink to="/skills" className={({isActive}) => isActive ? "text-teal font-semibold" : "text-slate-300 hover:text-white transition"}>
-              Skills
-            </NavLink>
-            <NavLink to="/overall-assessment" className={({isActive}) => isActive ? "text-teal font-semibold" : "text-slate-300 hover:text-white transition flex items-center gap-1"}>
-              <BarChart2 className="w-4 h-4" /> Index Dashboard
+          <nav aria-label="Main" className="hidden lg:flex items-center space-x-6 text-sm font-medium">
+            <NavLink to="/tests" className={linkClass}>All Tests</NavLink>
+            {CATEGORIES.map(cat => (
+              <NavLink key={cat.slug} to={`/${cat.slug}`} className={linkClass}>
+                {cat.name}
+              </NavLink>
+            ))}
+            <NavLink to="/overall-assessment" className={dashboardClass}>
+              <BarChart2 className="w-4 h-4" aria-hidden="true" /> Index Dashboard
             </NavLink>
           </nav>
 
@@ -67,10 +75,11 @@ export const Navbar: React.FC = () => {
           <div className="flex items-center space-x-4">
             <div className="relative hidden md:block w-48 lg:w-64">
               <input
-                type="text"
+                type="search"
+                aria-label="Search assessments"
                 placeholder="Search assessments..."
                 value={searchQuery}
-                onChange={handleSearch}
+                onChange={e => setSearchQuery(e.target.value)}
                 className="w-full bg-navy-800 text-sm text-white placeholder-slate-400 rounded-md px-3 py-1.5 border border-navy-700 focus:outline-none focus:border-teal"
               />
               {searchResults.length > 0 && (
@@ -79,7 +88,7 @@ export const Navbar: React.FC = () => {
                     <Link
                       key={test.id}
                       to={`/tests/${test.slug}`}
-                      onClick={() => { setSearchQuery(''); setSearchResults([]); }}
+                      onClick={clearSearch}
                       className="block px-3 py-2 text-xs hover:bg-navy-700 text-slate-200 border-b border-navy-700/50 last:border-none"
                     >
                       <div className="font-semibold text-white">{test.title}</div>
@@ -91,10 +100,14 @@ export const Navbar: React.FC = () => {
             </div>
 
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden text-slate-300 hover:text-white p-1.5 rounded-md focus:outline-none"
+              type="button"
+              onClick={() => setMobileMenuOpen(open => !open)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu"
+              className="lg:hidden text-slate-300 hover:text-white p-1.5 rounded-md"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-6 h-6" aria-hidden="true" /> : <Menu className="w-6 h-6" aria-hidden="true" />}
             </button>
           </div>
         </div>
@@ -102,13 +115,14 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-navy-800 border-t border-navy-700 px-4 pt-2 pb-4 space-y-2">
+        <div id="mobile-menu" className="lg:hidden bg-navy-800 border-t border-navy-700 px-4 pt-2 pb-4 space-y-2">
           <div className="py-2">
             <input
-              type="text"
+              type="search"
+              aria-label="Search assessments"
               placeholder="Search assessments..."
               value={searchQuery}
-              onChange={handleSearch}
+              onChange={e => setSearchQuery(e.target.value)}
               className="w-full bg-navy-900 text-sm text-white placeholder-slate-400 rounded-md px-3 py-2 border border-navy-700 focus:outline-none focus:border-teal"
             />
             {searchResults.length > 0 && (
@@ -117,7 +131,7 @@ export const Navbar: React.FC = () => {
                   <Link
                     key={test.id}
                     to={`/tests/${test.slug}`}
-                    onClick={() => { setSearchQuery(''); setSearchResults([]); setMobileMenuOpen(false); }}
+                    onClick={() => { clearSearch(); closeMobile(); }}
                     className="block px-3 py-2 text-xs hover:bg-navy-700 text-slate-200 border-b border-navy-700 last:border-none"
                   >
                     <div className="font-semibold text-white">{test.title}</div>
@@ -126,14 +140,14 @@ export const Navbar: React.FC = () => {
               </div>
             )}
           </div>
-          <Link to="/tests" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white">All Tests</Link>
-          <Link to="/physical" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white">Physical</Link>
-          <Link to="/cognitive" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white">Cognitive</Link>
-          <Link to="/psychological" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white">Psychological</Link>
-          <Link to="/lifestyle" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white">Lifestyle</Link>
-          <Link to="/skills" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-300 hover:text-white">Skills</Link>
-          <Link to="/overall-assessment" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-teal font-semibold flex items-center gap-1">
-            <BarChart2 className="w-4 h-4" /> Overall Assessment Index
+          <Link to="/tests" onClick={closeMobile} className="block py-2 text-slate-300 hover:text-white">All Tests</Link>
+          {CATEGORIES.map(cat => (
+            <Link key={cat.slug} to={`/${cat.slug}`} onClick={closeMobile} className="block py-2 text-slate-300 hover:text-white">
+              {cat.name}
+            </Link>
+          ))}
+          <Link to="/overall-assessment" onClick={closeMobile} className="py-2 text-teal font-semibold flex items-center gap-1">
+            <BarChart2 className="w-4 h-4" aria-hidden="true" /> Overall Assessment Index
           </Link>
         </div>
       )}

@@ -21,6 +21,25 @@ describe('Timer Utilities', () => {
     expect(timer.isRunning()).toBe(false);
   });
 
+  it('accumulates across pause and resume, and can reset', () => {
+    let fakeTime = 0;
+    const timer = createTimer(() => fakeTime);
+
+    timer.start();
+    fakeTime = 1000;
+    timer.stop();
+    fakeTime = 5000; // paused: should not count
+    expect(timer.getElapsedMs()).toBe(1000);
+
+    timer.start();
+    fakeTime = 5500;
+    expect(timer.getElapsedMs()).toBe(1500);
+
+    timer.reset();
+    expect(timer.isRunning()).toBe(false);
+    expect(timer.getElapsedMs()).toBe(0);
+  });
+
   it('formats elapsed time correctly', () => {
     expect(formatElapsedTime(0)).toBe('00:00');
     expect(formatElapsedTime(65000)).toBe('01:05');

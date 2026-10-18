@@ -15,6 +15,7 @@ export default {
         teal: {
           DEFAULT: '#00B4D8',
           accent: '#48CAE4',
+          dark: '#0077B6', // AA-contrast teal for text on light backgrounds
         }
       }
     },

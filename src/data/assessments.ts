@@ -10,7 +10,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     shortDescription: 'Calculate Body Mass Index with unit conversion and contextual health insights.',
     durationMinutes: 2,
     eligibleForComposite: false,
-    status: 'available'
+    status: 'coming-soon'
   },
   {
     id: 'wth',
@@ -20,7 +20,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     shortDescription: 'Evaluate central adiposity risk distribution relative to height.',
     durationMinutes: 2,
     eligibleForComposite: false,
-    status: 'available'
+    status: 'coming-soon'
   },
   {
     id: 'plank',
@@ -30,7 +30,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     shortDescription: 'Measure isometric core muscular endurance with guided pacing.',
     durationMinutes: 3,
     eligibleForComposite: false,
-    status: 'available'
+    status: 'coming-soon'
   },
   // Cognitive
   {
@@ -42,7 +42,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     durationMinutes: 5,
     questionCount: 10,
     eligibleForComposite: true,
-    status: 'available'
+    status: 'coming-soon'
   },
   {
     id: 'numerical-reasoning',
@@ -53,7 +53,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     durationMinutes: 6,
     questionCount: 8,
     eligibleForComposite: true,
-    status: 'available'
+    status: 'coming-soon'
   },
   {
     id: 'memory-challenge',
@@ -63,7 +63,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     shortDescription: 'Assess working memory retention span with sequential visual/numeric recall.',
     durationMinutes: 4,
     eligibleForComposite: true,
-    status: 'available'
+    status: 'coming-soon'
   },
   // Psychological
   {
@@ -75,7 +75,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     durationMinutes: 7,
     questionCount: 20,
     eligibleForComposite: false,
-    status: 'available'
+    status: 'coming-soon'
   },
   {
     id: 'stress-wellbeing',
@@ -86,7 +86,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     durationMinutes: 5,
     questionCount: 10,
     eligibleForComposite: false,
-    status: 'available'
+    status: 'coming-soon'
   },
   // Lifestyle
   {
@@ -98,7 +98,7 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     durationMinutes: 4,
     questionCount: 12,
     eligibleForComposite: false,
-    status: 'available'
+    status: 'coming-soon'
   },
   // Skills
   {
@@ -110,6 +110,6 @@ export const ASSESSMENTS: AssessmentMeta[] = [
     durationMinutes: 5,
     questionCount: 15,
     eligibleForComposite: true,
-    status: 'available'
+    status: 'coming-soon'
   }
 ];

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, ShieldCheck, FileText, Info, Mail } from 'lucide-react';
+import { Activity, ShieldCheck, FileText } from 'lucide-react';
+import { CATEGORIES } from '../../data/categories';
 
 export const Footer: React.FC = () => {
   return (
@@ -11,7 +12,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3 md:col-span-1">
             <div className="flex items-center space-x-2 text-white font-bold">
               <div className="bg-teal p-1.5 rounded-lg text-navy-900">
-                <Activity className="w-5 h-5" />
+                <Activity className="w-5 h-5" aria-hidden="true" />
               </div>
               <span className="text-lg">HumanScore</span>
             </div>
@@ -24,11 +25,11 @@ export const Footer: React.FC = () => {
           <div>
             <h4 className="text-white font-semibold mb-3 text-xs uppercase tracking-wider">Assessments</h4>
             <ul className="space-y-2 text-xs">
-              <li><Link to="/physical" className="hover:text-teal transition">Physical Tests</Link></li>
-              <li><Link to="/cognitive" className="hover:text-teal transition">Cognitive Challenges</Link></li>
-              <li><Link to="/psychological" className="hover:text-teal transition">Psychological Reflection</Link></li>
-              <li><Link to="/lifestyle" className="hover:text-teal transition">Lifestyle & Habits</Link></li>
-              <li><Link to="/skills" className="hover:text-teal transition">Skills & Knowledge</Link></li>
+              {CATEGORIES.map(cat => (
+                <li key={cat.slug}>
+                  <Link to={`/${cat.slug}`} className="hover:text-teal transition">{cat.footerLabel}</Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -40,7 +41,6 @@ export const Footer: React.FC = () => {
               <li><Link to="/scoring-methodology" className="hover:text-teal transition">Scoring Methodology</Link></li>
               <li><Link to="/about" className="hover:text-teal transition">About HumanScore</Link></li>
               <li><Link to="/contact" className="hover:text-teal transition">Contact & Feedback</Link></li>
-              <li><Link to="/FAQ" className="hover:text-teal transition">FAQ</Link></li>
             </ul>
           </div>
 
@@ -54,12 +54,12 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-t border-navy-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
+        <div className="border-t border-navy-800 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400">
           <p>© {new Date().getFullYear()} HumanScore. Educational and informational self-assessment platform. Not a medical or diagnostic service.</p>
           <div className="flex space-x-4 mt-4 sm:mt-0">
-            <Link to="/privacy-policy" className="hover:text-slate-400">Privacy</Link>
-            <Link to="/disclaimer" className="hover:text-slate-400">Disclaimer</Link>
-            <Link to="/scoring-methodology" className="hover:text-slate-400">Methodology</Link>
+            <Link to="/privacy-policy" className="hover:text-white">Privacy</Link>
+            <Link to="/disclaimer" className="hover:text-white">Disclaimer</Link>
+            <Link to="/scoring-methodology" className="hover:text-white">Methodology</Link>
           </div>
         </div>
       </div>
