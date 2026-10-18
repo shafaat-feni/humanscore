@@ -41,6 +41,7 @@ export const Footer: React.FC = () => {
               <li><Link to="/scoring-methodology" className="hover:text-teal transition">Scoring Methodology</Link></li>
               <li><Link to="/about" className="hover:text-teal transition">About HumanScore</Link></li>
               <li><Link to="/contact" className="hover:text-teal transition">Contact & Feedback</Link></li>
+              <li><Link to="/FAQ" className="hover:text-teal transition">Frequently Asked Questions</Link></li>
             </ul>
           </div>
 
